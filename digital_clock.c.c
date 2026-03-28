@@ -1,79 +1,79 @@
 #include <stdio.h>
 #include <ctype.h>
 
-// Ορισμός σταθεράς
-#define megistos_arithmos_eisodou 10
+// Maximum number of input characters
+#define MAX_INPUT_COUNT 10
 
-// Δήλωση συναρτήσεων
-void adiasma_pinaka_eksodos(void);
-void epeksergasia_eisodou(int eisodos, int thesi);
-void ektuposi_eksodou(void);
+// Function declarations
+void clear_output_buffer(void);
+void process_input(int value, int position);
+void print_output(void);
 
-// Δημιουργία πίνακα των αριθμών και των γραμμάτων
-const int kommatia_endeikti[13][7] =
-       { { 1, 1, 1, 1, 1, 1, 0},   /*αριθμος 0*/
-         { 0, 1, 1, 0, 0, 0, 0},   /*αριθμος 1*/
-         { 1, 1, 0, 1, 1, 0, 1},   /*αριθμος 2*/
-         { 1, 1, 1, 1, 0, 0, 1},   /*αριθμος 3*/
-         { 0, 1, 1, 0, 0, 1, 1},   /*αριθμος 4*/
-         { 1, 0, 1, 1, 0, 1, 1},   /*αριθμος 5*/
-         { 1, 0, 1, 1, 1, 1, 1},   /*αριθμος 6*/
-         { 1, 1, 1, 0, 0, 0, 0},   /*αριθμος 7*/
-         { 1, 1, 1, 1, 1, 1, 1},   /*αριθμος 8*/
-         { 1, 1, 1, 1, 0, 1, 1},   /*αριθμος 9*/
-         { 1, 1, 1, 0, 1, 1, 1},   /*γραμμα A*/
-         { 1, 0, 0, 1, 1, 1, 0},   /*γραμμα C*/
-         { 1, 0, 0, 0, 1, 1, 1}    /*γραμμα F*/
+// 7‑segment mapping for digits and letters
+const int segment_map[13][7] =
+       { { 1, 1, 1, 1, 1, 1, 0},   /* number 0 */
+         { 0, 1, 1, 0, 0, 0, 0},   /* number 1 */
+         { 1, 1, 0, 1, 1, 0, 1},   /* number 2 */
+         { 1, 1, 1, 1, 0, 0, 1},   /* number 3 */
+         { 0, 1, 1, 0, 0, 1, 1},   /* number 4 */
+         { 1, 0, 1, 1, 0, 1, 1},   /* number 5 */
+         { 1, 0, 1, 1, 1, 1, 1},   /* number 6 */
+         { 1, 1, 1, 0, 0, 0, 0},   /* number 7 */
+         { 1, 1, 1, 1, 1, 1, 1},   /* number 8 */
+         { 1, 1, 1, 1, 0, 1, 1},   /* number 9 */
+         { 1, 1, 1, 0, 1, 1, 1},   /* letter A */
+         { 1, 0, 0, 1, 1, 1, 0},   /* letter C */
+         { 1, 0, 0, 0, 1, 1, 1}    /* letter F */
        };
 
-// Δήλωση πίνακα για εκτύπωση των αριθμων και των γραμμάτων 
-char eksodos[4][megistos_arithmos_eisodou*4];
+// Output buffer for printing
+char output[4][MAX_INPUT_COUNT * 4];
 
-// Δημιουργία πίνακα για αντιστοίχηση ενδείκτη
-const int thesi_kommation[7][2] = {
-       { 0, 1},    /* 0 */
-       { 1, 2},    /* 1 */
-       { 2, 2},    /* 2 */
-       { 2, 1},    /* 3 */
-       { 2, 0},    /* 4 */
-       { 1, 0},    /* 5 */
-       { 1, 1}     /* 6 */
+// Segment positions (row, col)
+const int segment_position[7][2] = {
+       { 0, 1},    /* segment 0 */
+       { 1, 2},    /* segment 1 */
+       { 2, 2},    /* segment 2 */
+       { 2, 1},    /* segment 3 */
+       { 2, 0},    /* segment 4 */
+       { 1, 0},    /* segment 5 */
+       { 1, 1}     /* segment 6 */
 };
 
-/*Συνάρτηση για άδειασμα του πίνακα */
-void adiasma_pinaka_eksodos(void) {
+/* Clears the output buffer */
+void clear_output_buffer(void) {
 
    char ch = ' ';
    int i, j;
 
    for (i = 0; i < 4; i++) {
-       for (j = 0; j < megistos_arithmos_eisodou*4; j++) {
-           eksodos[i][j] = ch;
+       for (j = 0; j < MAX_INPUT_COUNT * 4; j++) {
+           output[i][j] = ch;
        }
    }
 }
 
-// Συνάρτηση που ορίζει ανάλογα την είσοδο, την θέση που θα τοποθετηθούνε  _ ή  |
-void epeksergasia_eisodou(int eisodos, int thesi) {
+/* Processes a single input character and sets the correct segments */
+void process_input(int value, int position) {
 
    int i, row, col;
    for (i = 0; i < 7; i++) {
-       if(kommatia_endeikti[eisodos][i]) {
-           row = thesi_kommation[i][0];
-           col = thesi_kommation[i][1] + thesi*4;
-           eksodos[row][col] = i % 3 == 0 ? '_' : '|';
+       if(segment_map[value][i]) {
+           row = segment_position[i][0];
+           col = segment_position[i][1] + position * 4;
+           output[row][col] = i % 3 == 0 ? '_' : '|';
        }
    }
 }
 
-// Συνάρτηση για την εκτύπωση 
-void ektuposi_eksodou(void) {
+/* Prints the final 7‑segment output */
+void print_output(void) {
 
    int i, j;
 
    for (i = 0; i < 4 ; i++) {
-       for (j = 0; j < megistos_arithmos_eisodou*4 ; j++) {
-           putchar(eksodos[i][j]);
+       for (j = 0; j < MAX_INPUT_COUNT * 4 ; j++) {
+           putchar(output[i][j]);
        }
        printf("\n");
    }
@@ -83,29 +83,29 @@ int main(void) {
 
    char c;
    int count = 0;
-   int digit;
-   adiasma_pinaka_eksodos();
+   int value;
+   clear_output_buffer();
 
-   printf("Eisagete 10 xarakthres apo 0-9 kai A, C, F: \n");
+   printf("Enter 10 characters from 0-9 and A, C, F: \n");
 
-// Βρόχος για έλεγχο μέγιστου αριθμού εισόδου και χαρακτήρων
-   while ((c = getchar()) != '\n' && count < megistos_arithmos_eisodou) {
-       if (((isdigit(c)) || c == 'A') || (c=='C' || c=='F') ) {
+   // Loop to check max input count and valid characters
+   while ((c = getchar()) != '\n' && count < MAX_INPUT_COUNT) {
+       if (isdigit(c) || c == 'A' || c == 'C' || c == 'F') {
            switch(c){
-               case 'A': digit=10;
+               case 'A': value = 10;
                    break;
-               case 'C': digit=11;
+               case 'C': value = 11;
                    break;
-               case 'F': digit=12;
+               case 'F': value = 12;
                    break;
                default:
-                   digit = c - '0';
+                   value = c - '0';
            }
-           epeksergasia_eisodou(digit, count);
+           process_input(value, count);
            count++;
        }
    }
-   ektuposi_eksodou();
+   print_output();
 
    return 0;
 }
